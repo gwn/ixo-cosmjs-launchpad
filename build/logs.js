@@ -36,14 +36,17 @@ exports.parseEvent = parseEvent;
 function parseLog(input) {
     if (!utils_1.isNonNullObject(input))
         throw new Error("Log must be a non-null object");
-    const { msg_index, log } = input;
+    const { msg_index, log, events } = input;
     if (typeof msg_index !== "number")
         throw new Error("Log's msg_index must be a number");
     if (typeof log !== "string")
         throw new Error("Log's log must be a string");
+    if (!Array.isArray(events))
+        throw new Error("Log's events must be an array");
     return {
         msg_index: msg_index,
         log: log,
+        events: events.map(parseEvent),
     };
 }
 exports.parseLog = parseLog;

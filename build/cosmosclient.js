@@ -190,7 +190,6 @@ class CosmosClient {
             }
             : {
                 logs: result.logs ? logs_1.parseLogs(result.logs) : [],
-                events: result.events.map(logs_1.parseEvent),
                 rawLog: result.raw_log || "",
                 transactionHash: result.txhash,
                 data: result.data ? encoding_1.fromHex(result.data) : undefined,

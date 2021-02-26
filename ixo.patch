@@ -1,38 +1,3 @@
-diff --git a/build/cosmosclient.js b/build/cosmosclient.js
-index 5bbee21..a21bd27 100644
---- a/build/cosmosclient.js
-+++ b/build/cosmosclient.js
-@@ -190,6 +190,7 @@ class CosmosClient {
-             }
-             : {
-                 logs: result.logs ? logs_1.parseLogs(result.logs) : [],
-+                events: result.events.map(logs_1.parseEvent),
-                 rawLog: result.raw_log || "",
-                 transactionHash: result.txhash,
-                 data: result.data ? encoding_1.fromHex(result.data) : undefined,
-diff --git a/build/logs.js b/build/logs.js
-index a934ca8..7a48b44 100644
---- a/build/logs.js
-+++ b/build/logs.js
-@@ -36,17 +36,14 @@ exports.parseEvent = parseEvent;
- function parseLog(input) {
-     if (!utils_1.isNonNullObject(input))
-         throw new Error("Log must be a non-null object");
--    const { msg_index, log, events } = input;
-+    const { msg_index, log } = input;
-     if (typeof msg_index !== "number")
-         throw new Error("Log's msg_index must be a number");
-     if (typeof log !== "string")
-         throw new Error("Log's log must be a string");
--    if (!Array.isArray(events))
--        throw new Error("Log's events must be an array");
-     return {
-         msg_index: msg_index,
-         log: log,
--        events: events.map(parseEvent),
-     };
- }
- exports.parseLog = parseLog;
 diff --git a/build/secp256k1hdwallet.js b/build/secp256k1hdwallet.js
 index 0448cbb..636d2aa 100644
 --- a/build/secp256k1hdwallet.js
@@ -82,17 +47,3 @@ index 0448cbb..636d2aa 100644
      }
      get mnemonic() {
          return this.secret.toString();
-diff --git a/build/signingcosmosclient.js b/build/signingcosmosclient.js
-index 123b9c6..77f08d3 100644
---- a/build/signingcosmosclient.js
-+++ b/build/signingcosmosclient.js
-@@ -51,7 +51,8 @@ class SigningCosmosClient extends cosmosclient_1.CosmosClient {
-      * creates a single signature, assembles the signed transaction and broadcasts it.
-      */
-     async signAndBroadcast(msgs, fee, memo = "") {
--        const { accountNumber, sequence } = await this.getSequence();
-+        const { accountNumber = 0, sequence = 0 } = await this.getSequence().catch(() => ({}));
-+
-         const chainId = await this.getChainId();
-         const signDoc = encoding_1.makeSignDoc(msgs, fee, chainId, memo, accountNumber, sequence);
-         const { signed, signature } = await this.signer.sign(this.senderAddress, signDoc);

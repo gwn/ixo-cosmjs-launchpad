@@ -51,8 +51,7 @@ class SigningCosmosClient extends cosmosclient_1.CosmosClient {
      * creates a single signature, assembles the signed transaction and broadcasts it.
      */
     async signAndBroadcast(msgs, fee, memo = "") {
-        const { accountNumber = 0, sequence = 0 } = await this.getSequence().catch(() => ({}));
-
+        const { accountNumber, sequence } = await this.getSequence();
         const chainId = await this.getChainId();
         const signDoc = encoding_1.makeSignDoc(msgs, fee, chainId, memo, accountNumber, sequence);
         const { signed, signature } = await this.signer.sign(this.senderAddress, signDoc);
